@@ -15,6 +15,10 @@ import re
 import datetime
 import json
 
+#We need to make sure that Python doesn't get confused about the cases of its entries!!
+
+key_category_list = [''] #here we put the different keys that we compare in our check functions
+# we may need other lists
 
 def decide(input_file, watchlist_file, countries_file):
     """
@@ -27,23 +31,23 @@ def decide(input_file, watchlist_file, countries_file):
     :return: List of strings. Possible values of strings are: "Accept", "Reject", "Secondary", and "Quarantine"
     """
     with open("countries.json", 'r') as countries_reader, open('watchlist.json', 'r') as watchlist_reader, \
-            open('example_entries','r') as entries_reader:
+            open('example_entries.json','r') as entries_reader: #opens all of the necessary files
         countries_contents = countries_reader.read()
         countries_json = json.loads(countries_contents)
         watchlist_contents = watchlist_reader.read()
         watchlist_json = json.loads(watchlist_contents)
         entries_contents = entries_reader.read()
         entries_json = json.loads(entries_contents)
-    if check_quarantine(countries_json, entries_json) is False:
-        return ["Quarantine"]
-    elif check_valid_visa(countries_json, entries_json) is False:
-        return ["Reject"]
-    elif check_watchlist(watchlist_json, entries_json) is False:
-        return ["Detain for Secondary Processing"]
-    elif check_from_kanadia(entries_json) is True:
+    # if check_quarantine(countries_json, entries_json) is False:  # first priority check
+        #return ["Quarantine"]
+    # elif check_valid_visa(countries_json, entries_json) is False:  # second priority check
+        #return ["Reject"]
+    #if check_watchlist(watchlist_json, entries_json) is False:  # third priority check
+        # return ["Detain for Secondary Processing"]
+    if check_from_kan(entries_json) is True: #fourth priority check
         return ["Accept. Welcome home, citizen."]
-    else:
-        return ["Accept."]
+    # else:
+        # print(["Accept"])
 
 
 def check_quarantine(countries_list, persons_list):
@@ -54,7 +58,7 @@ def check_quarantine(countries_list, persons_list):
     :param persons_list: The name of a JSON formatted file with person's "from" and "home" keys
     :return: a Boolean which is True when there is no quarantine and False when the subject must be quarantined
     """
-    # if
+
 
 def check_valid_visa(countries_list, persons_list):
     """
@@ -67,19 +71,28 @@ def check_valid_visa(countries_list, persons_list):
 
 def check_watchlist(watchlist, persons_list):
     """
-    Checks the passport number and name of persons against the watchlist.
+    Checks the passport number and name of persons against the watchlist by iterating over the entries file and
+    comparing them with the watchlist files
 
     :param watchlist: The name of a JSON formatted files with names and passport numbers for 'Secondary Processing'
     :param persons_list: The name of a JSON formatted file with the names and passports of people entering Kanadia
     :return: a Bool which is True when someone is not on the watchlist and False when they must be detained.
     """
+    for entrant in persons_list:
+        for suspect in watchlist:
+            if entrant["passport"].upper() == suspect['passport'].upper() or \
+                entrant['first_name'] == suspect['first_name'] and suspect['last_name'] == entrant['last_name']:
+                print(entrant["passport"].upper(), entrant['first_name'], entrant['last_name'], ["Secondary"])
 
-def check_from_kanadia(persons_list):
+def check_from_kan(persons_list):
     """
     Checks whether a person is from Kanadia, and if they meet the other requirements, admits them home
     :param persons_list: the name of a JSON formatted file with the names and passports of people entering Kanadia
     :return: A bool which is True if person is from Kanadia, False otherwise
     """
+    for citizen in persons_list:
+        if citizen['from']['country'].upper == "KAN":
+            print(citizen["first_name"], citizen['last_name'], ["Accept"])
 
 def valid_passport_format(passport_number):
     """
@@ -107,3 +120,5 @@ def valid_date_format(date_string):
     except ValueError:
         return False
 
+
+decide("test_returning_citizen.json", "watchlist.json", "countries.json")
