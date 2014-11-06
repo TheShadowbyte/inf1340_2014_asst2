@@ -3,10 +3,10 @@
 """ Computer-based immigration office for Kanadia """
 
 __author__ = 'Curtis and Dimitar'
-__email__ = "curtis.mccordW@utoronto.ca"
+__email__ = "curtis.mccordW@utoronto.ca and jordanov@mail.utoronto.ca"
 
 __copyright__ = "Whatever"
-__license__ = "Whatever"
+__license__ = "MIT License"
 
 __status__ = "Working on it"
 
@@ -17,8 +17,9 @@ import json
 
 #We need to make sure that Python doesn't get confused about the cases of its entries!!
 
-key_category_list = [''] #here we put the different keys that we compare in our check functions
+key_category_list = ['']  # here we put the different keys that we compare in our check functions
 # we may need other lists
+
 
 def decide(input_file, watchlist_file, countries_file):
     """
@@ -31,7 +32,7 @@ def decide(input_file, watchlist_file, countries_file):
     :return: List of strings. Possible values of strings are: "Accept", "Reject", "Secondary", and "Quarantine"
     """
     with open("countries.json", 'r') as countries_reader, open('watchlist.json', 'r') as watchlist_reader, \
-            open('example_entries.json','r') as entries_reader: #opens all of the necessary files
+            open('example_entries.json', 'r') as entries_reader:  # opens all of the necessary files
         countries_contents = countries_reader.read()
         countries_json = json.loads(countries_contents)
         watchlist_contents = watchlist_reader.read()
@@ -44,7 +45,7 @@ def decide(input_file, watchlist_file, countries_file):
         #return ["Reject"]
     #if check_watchlist(watchlist_json, entries_json) is False:  # third priority check
         # return ["Detain for Secondary Processing"]
-    if check_from_kan(entries_json) is True: #fourth priority check
+    if check_from_kan(entries_json) is True:  # fourth priority check
         return ["Accept. Welcome home, citizen."]
     # else:
         # print(["Accept"])
@@ -84,6 +85,7 @@ def check_watchlist(watchlist, persons_list):
                 entrant['first_name'] == suspect['first_name'] and suspect['last_name'] == entrant['last_name']:
                 print(entrant["passport"].upper(), entrant['first_name'], entrant['last_name'], ["Secondary"])
 
+
 def check_from_kan(persons_list):
     """
     Checks whether a person is from Kanadia, and if they meet the other requirements, admits them home
@@ -94,9 +96,10 @@ def check_from_kan(persons_list):
         if citizen['from']['country'].upper == "KAN":
             print(citizen["first_name"], citizen['last_name'], ["Accept"])
 
+
 def valid_passport_format(passport_number):
     """
-    Checks whether a pasport number is five sets of five alpha-number characters separated by dashes
+    Checks whether a passport number is five sets of five alpha-number characters separated by dashes
     :param passport_number: alpha-numeric string
     :return: Boolean; True if the format is valid, False otherwise
     """
