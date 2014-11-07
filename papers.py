@@ -44,17 +44,20 @@ def decide(input_file, watchlist_file, countries_file):
         raise FileNotFoundError
     for entrant in entries_json:
         #if check_quarantine(countries_json, entries_json) is False:  # first priority check
+            # decision_value_list.append('Quarantine')
+            # continue
             #return ["Quarantine"]
         # elif check_valid_visa(countries_json, entries_json) is False:  # second priority check
             #return ["Reject"]
         if check_watchlist(watchlist_json, entrant) != 'Accept':
             # decision = check_watchlist(watchlist_json, entrant)
-            decision_value_list.append('Secondary')
-            print(decision_value_list)
+            # decision_value_list.append('Secondary')
+            print('Secondary')
             continue
         #if check_from_kan(entrant) is True: #fourth priority check
             #return ["Accept. Welcome home, citizen."]
-        #else:
+        else:
+            print('Accept')
             #decision = 'Accept'
             #decision_value_list.append(entrant['passport'].upper(), entrant['first_name'].upper(), entrant['last_name'].upper(), decision)
 
