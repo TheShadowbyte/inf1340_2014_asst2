@@ -17,9 +17,10 @@ import json
 
 #We need to make sure that Python doesn't get confused about the cases of its entries!!
 
-key_category_list = [''] #here we put the different keys that we compare in our check functions
+key_category_list = ['']  # here we put the different keys that we compare in our check functions
 decision_value_list = ['']
 # we may need other lists
+
 
 def decide(input_file, watchlist_file, countries_file):
     """
@@ -31,9 +32,10 @@ def decide(input_file, watchlist_file, countries_file):
         an entry or transit visa is required, and whether there is currently a medical advisory
     :return: List of strings. Possible values of strings are: "Accept", "Reject", "Secondary", and "Quarantine"
     """
+
     try:
-        with open("countries.json", 'r') as countries_reader, open('watchlist.json', 'r') as watchlist_reader, \
-            open('example_entries.json','r') as entries_reader: #opens all of the necessary files
+        with open(countries_file, 'r') as countries_reader, open(watchlist_file, 'r') as watchlist_reader, \
+            open(input_file, 'r') as entries_reader:  # opens all of the necessary files
             countries_contents = countries_reader.read()
             countries_json = json.loads(countries_contents)
             watchlist_contents = watchlist_reader.read()
@@ -42,24 +44,33 @@ def decide(input_file, watchlist_file, countries_file):
             entries_json = json.loads(entries_contents)
     except FileNotFoundError:
         raise FileNotFoundError
+
+    list_of_checked_entrants = []
+
     for entrant in entries_json:
-        #if check_quarantine(countries_json, entries_json) is False:  # first priority check
+        valid_date_format(entrant)
+
+
+        # if check_quarantine(countries_json, entries_json) is False:  # first priority check
             # decision_value_list.append('Quarantine')
             # continue
             #return ["Quarantine"]
         # elif check_valid_visa(countries_json, entries_json) is False:  # second priority check
             #return ["Reject"]
-        if check_watchlist(watchlist_json, entrant) != 'Accept':
-            # decision = check_watchlist(watchlist_json, entrant)
-            # decision_value_list.append('Secondary')
-            print('Secondary')
-            continue
+
+        if check_watchlist(watchlist_json, entrant) == "Secondary":
+            list_of_checked_entrants.append("Secondary")
+        elif check_watchlist(watchlist_json, entrant) == "Accept":
+            list_of_checked_entrants.append("Accept")
+
+
+
         #if check_from_kan(entrant) is True: #fourth priority check
             #return ["Accept. Welcome home, citizen."]
-        else:
-            print('Accept')
-            #decision = 'Accept'
-            #decision_value_list.append(entrant['passport'].upper(), entrant['first_name'].upper(), entrant['last_name'].upper(), decision)
+        #else:
+            #print('Accept')
+
+    # print(list_of_checked_entrants)
 
 
 def check_quarantine(countries_json, entrant):
@@ -98,14 +109,16 @@ def check_watchlist(watchlist, entrant):
     :param entrant: The name of a JSON formatted file with the names and passports of people entering Kanadia
     :return: a Bool which is True when someone is not on the watchlist and False when they must be detained.
     """
+
     for suspect in watchlist:
-        if entrant["passport"].upper() == suspect['passport'].upper():
-            return 'Secondary'
+
+        if entrant["passport"].upper() == suspect["passport"].upper():
+            return "Secondary"
         elif entrant['first_name'].upper() == suspect['first_name'].upper() and \
                 suspect['last_name'].upper() == entrant['last_name'].upper():
-            return 'Secondary'
+            return "Secondary"
         else:
-            return 'Accept'
+            return "Accept"
 
 
 def check_from_kan(entrant):
@@ -133,17 +146,21 @@ def valid_passport_format(passport_number):
         return False
 
 
-def valid_date_format(date_string):
+def valid_date_format(entrant):
     """
     Checks whether a date has the format YYYY-mm-dd in numbers
     :param date_string: date to be checked
     :return: Boolean True if the format is valid, False otherwise
     """
-    try:
-        datetime.datetime.strptime(date_string, '%Y-%m-%d')
-        return True
-    except ValueError:
-        return False
+
+    for word in entrant:
+        if word == "visa":
+            try:
+                datetime.datetime.strptime(entrant[word]['date'], '%Y-%m-%d')
+                return True
+            except ValueError:
+                raise ValueError
 
 
-decide("test_returning_citizen.json", "watchlist.json", "countries.json")
+
+decide("test_date_format.json", "watchlist.json", "countries.json")
