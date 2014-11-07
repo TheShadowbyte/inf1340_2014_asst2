@@ -48,12 +48,13 @@ def decide(input_file, watchlist_file, countries_file):
     list_of_checked_entrants = []
 
     for entrant in entries_json:
+        reason(entrant, entries_json) # this function just checks the reason for traveling
 
         if check_quarantine(countries_json, entrant) is False:
             list_of_checked_entrants.append("Quarantine")
             continue
 
-        if check_valid_visa(entrant):
+        if check_valid_visa(entrant) is False:
             list_of_checked_entrants.append("Reject")
             continue
 
@@ -61,11 +62,13 @@ def decide(input_file, watchlist_file, countries_file):
             list_of_checked_entrants.append("Secondary")
             continue
 
-        #elif check_from_kan(entrant) is True: #fourth priority check
-            #list_of_checked_entrants.append("Accept")
+        if check_from_kan(entrant):
+            list_of_checked_entrants.append("Accept-From-Kan")
+            continue
 
         else:
             list_of_checked_entrants.append("Accept")
+
 
     print(list_of_checked_entrants)
 
@@ -137,10 +140,10 @@ def check_from_kan(entrant):
     :param entrant: the name of a JSON formatted file with the names and passports of people entering Kanadia
     :return: A bool which is True if person is from Kanadia, False otherwise
     """
-    for citizen in entrant:
-        if citizen['from']['country'].upper == "KAN" and \
-            entrant['entry_reason'] == 'returning':
-            return 'Accept'
+
+    if entrant['from']['country'].upper == "KAN" and entrant['entry_reason'] == 'returning':
+        return True
+
 
 def valid_passport_format(passport_number):
     """
@@ -172,5 +175,35 @@ def valid_date_format(entrant):
                 raise ValueError
 
 
+def visa_required(countries, entrant):
+    """
+    Checks whether the country requires a visa or not.
+    :param entrant:
+    :return:
+    """
+
+    for country in countries:
+        if countries[country]['transit_visa_required'] == 0 and entrant['from']['country'] == country['code']:
+            print("No Visa Required")
+        elif countries[country]['transit_visa_required'] == 1:
+            print("Visa Required")
+        else:
+            raise ValueError
+
+
+def reason(entrant, entrants):
+    """
+    Checks the entrant's motive for travelling.
+    :param entrant:
+    :return:
+    """
+
+    for entrant in entrants:
+        if entrant['entry_reason'] == "visit":
+            print("Visit")
+        elif entrant['entry_reason'] == "transit":
+            print("Visit")
+        else:
+            print("Other motive")
 
 decide("example_entries.json", "watchlist.json", "countries.json")
