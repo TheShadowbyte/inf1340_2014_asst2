@@ -3,10 +3,10 @@
 """ Computer-based immigration office for Kanadia """
 
 __author__ = 'Curtis and Dimitar'
-__email__ = "curtis.mccord@utoronto.ca"
+__email__ = "curtis.mccord@utoronto.ca and jordanov@mail.utoronto.ca"
 
 __copyright__ = "Whatever"
-__license__ = "Whatever"
+__license__ = "MIT Licence"
 
 __status__ = "Working on it"
 
@@ -48,28 +48,22 @@ def decide(input_file, watchlist_file, countries_file):
     list_of_checked_entrants = []
 
     for entrant in entries_json:
-        #print(entrant)
 
-        # valid_date_format(entrant)
-
-
-        if check_quarantine(countries_json, entrant) is False:  # first priority check
+        if check_quarantine(countries_json, entrant) is False:
             list_of_checked_entrants.append("Quarantine")
             continue
-        # elif check_valid_visa(countries_json, entries_json) is False:  # second priority check
-            #list_of_checked_entrants.append("Reject")
-            # continue
 
-        if check_watchlist(watchlist_json, entrant) == True:
+        if check_valid_visa(entrant):
+            list_of_checked_entrants.append("Reject")
+            continue
+
+        if check_watchlist(watchlist_json, entrant):
             list_of_checked_entrants.append("Secondary")
             continue
-        # elif check_watchlist(watchlist_json, entrant) == "Accept":
-            # list_of_checked_entrants.append("Accept")
-
-
 
         #elif check_from_kan(entrant) is True: #fourth priority check
             #list_of_checked_entrants.append("Accept")
+
         else:
             list_of_checked_entrants.append("Accept")
 
@@ -96,11 +90,10 @@ def check_quarantine(countries_json, entrant):
         return True
 
 
-
-def check_valid_visa(countries_list, entrant):
+def check_valid_visa(entrant):
     """
-    Checks the entries agaist
-    :param countries_list:
+    Checks the entries if the keyword visa exists and then checks if they have a containing word date.
+    Dates that are more than 2 years older than the current date are invalid.
     :param entrant:
     :return: a Boolean which is True when the visa is valid and False otherwise
     """
@@ -108,10 +101,13 @@ def check_valid_visa(countries_list, entrant):
     visa_oldest_date = datetime.datetime.now() - datetime.timedelta(days=730)
     for word in entrant:
         if word == "visa":
-            if entrant[word]['date'] < str(visa_oldest_date):
-                return True
-            else:
+            if not entrant[word]['date']:
                 return False
+            else:
+                if entrant[word]['date'] < str(visa_oldest_date):
+                    return True
+                else:
+                    return False
 
 
 def check_watchlist(watchlist, entrant):
