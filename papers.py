@@ -42,23 +42,24 @@ def decide(input_file, watchlist_file, countries_file):
             entries_json = json.loads(entries_contents)
     except FileNotFoundError:
         raise FileNotFoundError
-    decision = ''
     for entrant in entries_json:
-    # if check_quarantine(countries_json, entries_json) is False:  # first priority check
+        #if check_quarantine(countries_json, entries_json) is False:  # first priority check
             #return ["Quarantine"]
         # elif check_valid_visa(countries_json, entries_json) is False:  # second priority check
             #return ["Reject"]
-        decision = check_watchlist(watchlist_json, entrant)
         if check_watchlist(watchlist_json, entrant) != 'Accept':
-            decision_value_list.append(entrant['passport'].upper(), entrant['first_name'].upper(), entrant['last_name'].upper(), decision)
+            # decision = check_watchlist(watchlist_json, entrant)
+            decision_value_list.append('Secondary')
+            print(decision_value_list)
             continue
         #if check_from_kan(entrant) is True: #fourth priority check
             #return ["Accept. Welcome home, citizen."]
         #else:
-            print(decision_value_list)
+            #decision = 'Accept'
+            #decision_value_list.append(entrant['passport'].upper(), entrant['first_name'].upper(), entrant['last_name'].upper(), decision)
 
 
-def check_quarantine(countries_list, entrant):
+def check_quarantine(countries_json, entrant):
     """
     Checks the passport "from" and "home" keys against the medical advisory list.
 
@@ -66,6 +67,14 @@ def check_quarantine(countries_list, entrant):
     :param entrant: The name of a JSON formatted file with person's "from" and "home" keys
     :return: a Boolean which is True when there is no quarantine and False when the subject must be quarantined
     """
+    for country in countries_json:
+        if country['medical_advisory'] != "" and \
+            entrant['country']['from'].upper() == country['code'] or \
+            entrant['country']['via'].upper() == country['code']:
+            return 'Quarantine'
+        else:
+            return 'Accept'
+
 
 
 def check_valid_visa(countries_list, entrant):
@@ -103,9 +112,9 @@ def check_from_kan(entrant):
     :return: A bool which is True if person is from Kanadia, False otherwise
     """
     for citizen in entrant:
-        while citizen['from']['country'].upper == "KAN":
-            print(citizen["first_name"], citizen['last_name'], ["Accept"])
-            return True
+        if citizen['from']['country'].upper == "KAN" and \
+            entrant['entry_reason'] == 'returning':
+            return 'Accept'
 
 def valid_passport_format(passport_number):
     """
