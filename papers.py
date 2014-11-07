@@ -149,7 +149,7 @@ def valid_passport_format(passport_number):
 def valid_date_format(entrant):
     """
     Checks whether a date has the format YYYY-mm-dd in numbers
-    :param date_string: date to be checked
+    :param entrant: individual entrant's JSON fetched from for loop in decide()
     :return: Boolean True if the format is valid, False otherwise
     """
 
