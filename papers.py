@@ -48,29 +48,33 @@ def decide(input_file, watchlist_file, countries_file):
     list_of_checked_entrants = []
 
     for entrant in entries_json:
-        valid_date_format(entrant)
+        #print(entrant)
+
+        # valid_date_format(entrant)
 
 
         # if check_quarantine(countries_json, entries_json) is False:  # first priority check
             # decision_value_list.append('Quarantine')
             # continue
-            #return ["Quarantine"]
+            # rlist_of_checked_entrants.append("Quarantine")
         # elif check_valid_visa(countries_json, entries_json) is False:  # second priority check
-            #return ["Reject"]
+            #list_of_checked_entrants.append("Reject")
+            # continue
 
-        if check_watchlist(watchlist_json, entrant) == "Secondary":
+        if check_watchlist(watchlist_json, entrant) == True:
             list_of_checked_entrants.append("Secondary")
-        elif check_watchlist(watchlist_json, entrant) == "Accept":
+            continue
+        # elif check_watchlist(watchlist_json, entrant) == "Accept":
+            # list_of_checked_entrants.append("Accept")
+
+
+
+        #elif check_from_kan(entrant) is True: #fourth priority check
+            #list_of_checked_entrants.append("Accept")
+        else:
             list_of_checked_entrants.append("Accept")
 
-
-
-        #if check_from_kan(entrant) is True: #fourth priority check
-            #return ["Accept. Welcome home, citizen."]
-        #else:
-            #print('Accept')
-
-    # print(list_of_checked_entrants)
+    print(list_of_checked_entrants)
 
 
 def check_quarantine(countries_json, entrant):
@@ -113,12 +117,12 @@ def check_watchlist(watchlist, entrant):
     for suspect in watchlist:
 
         if entrant["passport"].upper() == suspect["passport"].upper():
-            return "Secondary"
+            return True
         elif entrant['first_name'].upper() == suspect['first_name'].upper() and \
                 suspect['last_name'].upper() == entrant['last_name'].upper():
-            return "Secondary"
-        else:
-            return "Accept"
+            return True
+
+    return False
 
 
 def check_from_kan(entrant):
@@ -163,4 +167,4 @@ def valid_date_format(entrant):
 
 
 
-decide("test_date_format.json", "watchlist.json", "countries.json")
+decide("example_entries.json", "watchlist.json", "countries.json")
