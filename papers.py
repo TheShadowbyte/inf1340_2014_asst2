@@ -102,8 +102,16 @@ def check_valid_visa(countries_list, entrant):
     Checks the entries agaist
     :param countries_list:
     :param entrant:
-    :return:
+    :return: a Boolean which is True when the visa is valid and False otherwise
     """
+
+    visa_oldest_date = datetime.datetime.now() - datetime.timedelta(days=730)
+    for word in entrant:
+        if word == "visa":
+            if entrant[word]['date'] < str(visa_oldest_date):
+                return True
+            else:
+                return False
 
 
 def check_watchlist(watchlist, entrant):
