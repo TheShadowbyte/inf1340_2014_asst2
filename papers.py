@@ -53,10 +53,9 @@ def decide(input_file, watchlist_file, countries_file):
         # valid_date_format(entrant)
 
 
-        # if check_quarantine(countries_json, entries_json) is False:  # first priority check
-            # decision_value_list.append('Quarantine')
-            # continue
-            # rlist_of_checked_entrants.append("Quarantine")
+        if check_quarantine(countries_json, entrant) is False:  # first priority check
+            list_of_checked_entrants.append("Quarantine")
+            continue
         # elif check_valid_visa(countries_json, entries_json) is False:  # second priority check
             #list_of_checked_entrants.append("Reject")
             # continue
@@ -85,13 +84,16 @@ def check_quarantine(countries_json, entrant):
     :param entrant: The name of a JSON formatted file with person's "from" and "home" keys
     :return: a Boolean which is True when there is no quarantine and False when the subject must be quarantined
     """
-    for country in countries_json:
-        if country['medical_advisory'] != "" and \
-            entrant['country']['from'].upper() == country['code'] or \
-            entrant['country']['via'].upper() == country['code']:
-            return 'Quarantine'
-        else:
-            return 'Accept'
+    #print(entrant)
+    from_country = entrant['from']['country']
+    if countries_json[from_country]["medical_advisory"] != "":
+        return False
+    elif 'via' in entrant:
+        via_country = entrant['via']['country']
+        if countries_json[via_country]['medical_advisory'] != "":
+            return False
+    else:
+        return True
 
 
 
