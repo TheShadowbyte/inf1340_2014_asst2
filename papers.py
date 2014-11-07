@@ -48,7 +48,7 @@ def decide(input_file, watchlist_file, countries_file):
     list_of_checked_entrants = []
 
     for entrant in entries_json:
-        reason(entrant, entries_json) # this function just checks the reason for traveling
+        reason(entries_json) # this function just checks the reason for traveling
 
         if check_quarantine(countries_json, entrant) is False:
             list_of_checked_entrants.append("Quarantine")
@@ -178,32 +178,32 @@ def valid_date_format(entrant):
 def visa_required(countries, entrant):
     """
     Checks whether the country requires a visa or not.
-    :param entrant:
+    :param entrant: Boolean True is a transit visa is required and False if it is not required.
     :return:
     """
 
     for country in countries:
         if countries[country]['transit_visa_required'] == 0 and entrant['from']['country'] == country['code']:
-            print("No Visa Required")
+            return False
         elif countries[country]['transit_visa_required'] == 1:
-            print("Visa Required")
+            return True
         else:
             raise ValueError
 
 
-def reason(entrant, entrants):
+def reason(entrants):
     """
     Checks the entrant's motive for travelling.
-    :param entrant:
     :return:
     """
 
     for entrant in entrants:
         if entrant['entry_reason'] == "visit":
-            print("Visit")
+            return "Visit"
         elif entrant['entry_reason'] == "transit":
-            print("Visit")
-        else:
-            print("Other motive")
+            return "Transit"
+        elif entrant['entry_reason'] == "returning":
+            return "Returning"
+
 
 decide("example_entries.json", "watchlist.json", "countries.json")
