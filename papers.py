@@ -219,24 +219,17 @@ def check_req_keys(entrant):
    :param entrant: The dictionary of entrants to be looped over
    :return: Returns a Bool that is False iff a required json key is omitted
    """
-    for key in entrant:
-        if 'first_name' not in entrant or \
-                        'last_name' not in entrant or \
-                        'passport' not in entrant or \
-                        'date_of_birth' not in entrant or \
-                        'home' not in entrant or \
-                        'from' not in entrant or \
-                        'reason_for_entry' not in entrant:
-            return False
-        elif ['first_name'] == "" or \
-                        ['first_name'] == "" or \
-                        ['passport'] == "" or \
-                        ['date_of_birth'] == "" or \
-                        ['home'] == "" or \
-                        ['from'] == "" or \
-                        ['reason_for_entry'] == "":
-            return False
-        else:
-            return True
+
+    if entrant['first_name'] == "" or \
+                    entrant['first_name'] == "" or \
+                    entrant['passport'] == "" or \
+                    entrant['birth_date'] == "" or \
+                    entrant['home'] == "" or \
+                    entrant['from'] == "" or \
+                    entrant['entry_reason'] == "":
+        return False
+    else:
+        return True
+
 
 decide("example_entries.json", "watchlist.json", "countries.json")
