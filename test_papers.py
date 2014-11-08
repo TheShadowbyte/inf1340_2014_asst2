@@ -14,7 +14,7 @@ __status__ = "Prototype"
 import pytest
 from papers import decide
 
-
+'''
 def test_basic():
     assert decide("test_returning_citizen.json", "watchlist.json", "countries.json") == ["Accept", "Accept"]
     assert decide("test_watchlist.json", "watchlist.json", "countries.json") == ["Secondary"]
@@ -30,4 +30,8 @@ def test_files():
 
 
 # add functions for other tests
+'''
 
+
+def test_date_format():
+    decide("test_date_format.json",  "watchlist.json", "countries.json")

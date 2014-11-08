@@ -214,22 +214,29 @@ def reason(entrants):
 
 def check_req_keys(entrant):
     """
-    (dict key) -> Bool
-    Loops through the
-    :param entrant: The dictionary of entrants to be looped over
-    :return: Returns a Bool that is False iff a required json key is omitted
-    """
+   (dict key) -> Bool
+   Loops through the
+   :param entrant: The dictionary of entrants to be looped over
+   :return: Returns a Bool that is False iff a required json key is omitted
+   """
     for key in entrant:
-        if 'first_name' in entrant and \
-                        'last_name' in entrant and \
-                        'passport' in entrant and \
-                        'date_of_birth' in entrant and \
-                        'home' in entrant and \
-                        'from' in entrant and \
-                        'reason_for_entry' in entrant:
-            return True
-        else:
+        if 'first_name' not in entrant or \
+                        'last_name' not in entrant or \
+                        'passport' not in entrant or \
+                        'date_of_birth' not in entrant or \
+                        'home' not in entrant or \
+                        'from' not in entrant or \
+                        'reason_for_entry' not in entrant:
             return False
-
+        elif ['first_name'] == "" or \
+                        ['first_name'] == "" or \
+                        ['passport'] == "" or \
+                        ['date_of_birth'] == "" or \
+                        ['home'] == "" or \
+                        ['from'] == "" or \
+                        ['reason_for_entry'] == "":
+            return False
+        else:
+            return True
 
 decide("example_entries.json", "watchlist.json", "countries.json")
