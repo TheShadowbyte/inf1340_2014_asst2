@@ -48,15 +48,15 @@ def decide(input_file, watchlist_file, countries_file):
     list_of_checked_entrants = []
 
     for entrant in entries_json:
-        reason(entries_json) # this function just checks the reason for traveling
 
         if check_quarantine(countries_json, entrant) is False:
             list_of_checked_entrants.append("Quarantine")
             continue
 
-        if check_valid_visa(entrant) is False:
-            list_of_checked_entrants.append("Reject")
-            continue
+        if reason(entries_json) == "Visit" and visa_required(countries_json, entrant):
+            if check_valid_visa(entrant) is False:
+                list_of_checked_entrants.append("Reject")
+                continue
 
         if check_watchlist(watchlist_json, entrant):
             list_of_checked_entrants.append("Secondary")
@@ -68,7 +68,6 @@ def decide(input_file, watchlist_file, countries_file):
 
         else:
             list_of_checked_entrants.append("Accept")
-
 
     print(list_of_checked_entrants)
 
@@ -144,6 +143,8 @@ def check_from_kan(entrant):
     if entrant['from']['country'].upper == "KAN" and entrant['entry_reason'] == 'returning':
         return True
 
+    return False
+
 
 def valid_passport_format(passport_number):
     """
@@ -172,7 +173,7 @@ def valid_date_format(entrant):
                 datetime.datetime.strptime(entrant[word]['date'], '%Y-%m-%d')
                 return True
             except ValueError:
-                raise ValueError
+                raise ValueError("Wrong date format.")
 
 
 def visa_required(countries, entrant):
@@ -185,10 +186,10 @@ def visa_required(countries, entrant):
     for country in countries:
         if countries[country]['transit_visa_required'] == 0 and entrant['from']['country'] == country['code']:
             return False
-        elif countries[country]['transit_visa_required'] == 1:
+        elif countries[country]['transit_visa_required'] == 1 and entrant['from']['country'] == country['code']:
             return True
         else:
-            raise ValueError
+            return False
 
 
 def reason(entrants):
