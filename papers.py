@@ -184,9 +184,13 @@ def visa_required(countries, entrant):
     """
 
     for country in countries:
-        if countries[country]['transit_visa_required'] == 0 and entrant['from']['country'] == country['code']:
+        if countries[country]['visitor_visa_required'] == "0" and entrant['from']['country'] == country['code']:
             return False
-        elif countries[country]['transit_visa_required'] == 1 and entrant['from']['country'] == country['code']:
+        elif countries[country]['visitor_visa_required'] == "1" and entrant['from']['country'] == country['code']:
+            return True
+        elif countries[country]['transit_visa_required'] == "0" and entrant['from']['country'] == country['code']:
+            return False
+        elif countries[country]['transit_visa_required'] == "1" and entrant['from']['country'] == country['code']:
             return True
         else:
             return False
