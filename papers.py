@@ -220,26 +220,26 @@ def check_req_keys(entrant):
    :return: Returns a Bool that is False iff a required json key is omitted
    """
 
-    if entrant['first_name'] == "" or \
+    if entrant['first_name'] == -1 or \
+                        entrant['last_name'] == -1 or \
+                        entrant['passport'] == -1 or \
+                        entrant['birth_date'] == -1 or \
+                        entrant['home'] == -1 or \
+                        entrant['from'] == -1 or \
+                        entrant['entry_reason'] == -1:
+        return False
+    else:
+            if entrant['first_name'] == "" or \
                     entrant['last_name'] == "" or \
                     entrant['passport'] == "" or \
                     entrant['birth_date'] == "" or \
                     entrant['home'] == "" or \
                     entrant['from'] == "" or \
                     entrant['entry_reason'] == "":
-        return False
+                return False
+            else:
+                return True
 
-    elif entrant['first_name'] not in entrant or \
-                        entrant['last_name'] not in entrant or \
-                        entrant['passport'] not in entrant or \
-                        entrant['birth_date'] not in entrant or \
-                        entrant['home'] not in entrant or \
-                        entrant['from'] not in entrant or \
-                        entrant['entry_reason'] not in entrant:
-        return False
-
-    else:
-        return True
 
 
 decide("test_req_keys.json", "watchlist.json", "countries.json")
