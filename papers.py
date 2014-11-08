@@ -15,7 +15,7 @@ import re
 import datetime
 import json
 
-#We need to make sure that Python doesn't get confused about the cases of its entries!!
+# We need to make sure that Python doesn't get confused about the cases of its entries!!
 
 key_category_list = ['']  # here we put the different keys that we compare in our check functions
 decision_value_list = ['']
@@ -35,7 +35,7 @@ def decide(input_file, watchlist_file, countries_file):
 
     try:
         with open(countries_file, 'r') as countries_reader, open(watchlist_file, 'r') as watchlist_reader, \
-            open(input_file, 'r') as entries_reader:  # opens all of the necessary files
+                open(input_file, 'r') as entries_reader:  # opens all of the necessary files
             countries_contents = countries_reader.read()
             countries_json = json.loads(countries_contents)
             watchlist_contents = watchlist_reader.read()
@@ -80,7 +80,7 @@ def check_quarantine(countries_json, entrant):
     :param entrant: The name of a JSON formatted file with person's "from" and "home" keys
     :return: a Boolean which is True when there is no quarantine and False when the subject must be quarantined
     """
-    #print(entrant)
+    # print(entrant)
     from_country = entrant['from']['country']
     if countries_json[from_country]["medical_advisory"] != "":
         return False
@@ -127,7 +127,7 @@ def check_watchlist(watchlist, entrant):
         if entrant["passport"].upper() == suspect["passport"].upper():
             return True
         elif entrant['first_name'].upper() == suspect['first_name'].upper() and \
-                suspect['last_name'].upper() == entrant['last_name'].upper():
+                        suspect['last_name'].upper() == entrant['last_name'].upper():
             return True
 
     return False
@@ -205,6 +205,26 @@ def reason(entrants):
             return "Transit"
         elif entrant['entry_reason'] == "returning":
             return "Returning"
+
+
+def check_req_keys(entrant):
+    """
+    (dict key) -> Bool
+    Loops through the
+    :param entrant: The dictionary of entrants to be looped over
+    :return: Returns a Bool that is False iff a required json key is omitted
+    """
+    for key in entrant:
+        if 'first_name' in entrant and \
+                        'last_name' in entrant and \
+                        'passport' in entrant and \
+                        'date_of_birth' in entrant and \
+                        'home' in entrant and \
+                        'from' in entrant and \
+                        'reason_for_entry' in entrant:
+            return True
+        else:
+            return False
 
 
 decide("example_entries.json", "watchlist.json", "countries.json")
