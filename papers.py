@@ -219,22 +219,24 @@ def check_req_keys(entrant):
    :param entrant: The dictionary of entrants to be looped over
    :return: Returns a Bool that is False iff a required json key is omitted
    """
+    #key_list = ['passport', 'first_name', 'last_name', 'birth_date', 'home', 'from', 'entry_reason']
+    #if key_list not in entrant
 
-    if entrant['first_name'] == -1 or \
-                        entrant['last_name'] == -1 or \
-                        entrant['passport'] == -1 or \
-                        entrant['birth_date'] == -1 or \
-                        entrant['home'] == -1 or \
-                        entrant['from'] == -1 or \
-                        entrant['entry_reason'] == -1:
+    if 'first_name' not in entrant or \
+                        'last_name' not in entrant or \
+                        'passport' not in entrant or \
+                        'birth_date' not in entrant or\
+                        'home' not in entrant or \
+                        'from' not in entrant or \
+                        'entry_reason'not in entrant:
         return False
     else:
             if entrant['first_name'] == "" or \
                     entrant['last_name'] == "" or \
                     entrant['passport'] == "" or \
                     entrant['birth_date'] == "" or \
-                    entrant['home'] == "" or \
-                    entrant['from'] == "" or \
+                    entrant['home'] == {"" : ""} or \
+                    entrant['from'] == {"" : ""} or \
                     entrant['entry_reason'] == "":
                 return False
             else:
