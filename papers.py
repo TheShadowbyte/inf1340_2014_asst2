@@ -17,9 +17,7 @@ import json
 
 # We need to make sure that Python doesn't get confused about the cases of its entries!!
 
-key_category_list = ['']  # here we put the different keys that we compare in our check functions
-decision_value_list = ['']
-# we may need other lists
+
 
 
 def decide(input_file, watchlist_file, countries_file):
