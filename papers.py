@@ -44,7 +44,7 @@ def decide(input_file, watchlist_file, countries_file):
     list_of_checked_entrants = []
 
     for entrant in entries_json:
-        
+
         if check_req_keys(entrant) is False:
             list_of_checked_entrants.append("Reject")
             continue
@@ -190,7 +190,7 @@ def valid_date_format(entrant):
                 datetime.datetime.strptime(entrant[word]['date'], '%Y-%m-%d')
                 return True
             except ValueError:
-                raise ValueError("Wrong date format.")
+                return False
 
 
 def visa_required(countries, entrant):
