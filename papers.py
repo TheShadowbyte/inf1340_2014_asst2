@@ -38,7 +38,7 @@ def decide(input_file, watchlist_file, countries_file):
             watchlist_json = json.loads(watchlist_contents)
             entries_contents = entries_reader.read()
             entries_json = json.loads(entries_contents)
-    except FileNotFoundError:
+    except:
         raise FileNotFoundError
 
     list_of_checked_entrants = []
