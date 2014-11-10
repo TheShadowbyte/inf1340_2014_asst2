@@ -44,13 +44,16 @@ def decide(input_file, watchlist_file, countries_file):
     list_of_checked_entrants = []
 
     for entrant in entries_json:
-        #valid_visa_format(entrant)
-        #valid_passport_format(entrant)
+
         if check_quarantine(countries_json, entrant) is False:
             list_of_checked_entrants.append("Quarantine")
             continue
 
         if check_req_keys(entrant) is False:
+            list_of_checked_entrants.append("Reject")
+            continue
+
+        if valid_visa_format(entrant) is False or valid_passport_format(entrant) is False:
             list_of_checked_entrants.append("Reject")
             continue
 
