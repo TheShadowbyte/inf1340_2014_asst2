@@ -5,7 +5,7 @@
 __author__ = 'Curtis and Dimitar'
 __email__ = "curtis.mccord@utoronto.ca and jordanov@mail.utoronto.ca"
 
-__copyright__ = "Whatever"
+__copyright__ = "2014 Curtis McCord and Dimitar Jordanov"
 __license__ = "MIT Licence"
 
 __status__ = "Working on it"
@@ -16,8 +16,6 @@ import datetime
 import json
 
 # We need to make sure that Python doesn't get confused about the cases of its entries!!
-
-
 
 
 def decide(input_file, watchlist_file, countries_file):
@@ -46,15 +44,22 @@ def decide(input_file, watchlist_file, countries_file):
     list_of_checked_entrants = []
 
     for entrant in entries_json:
-
+        
         if check_req_keys(entrant) is False:
             list_of_checked_entrants.append("Reject")
             continue
 
-        if reason(entries_json) == "Visit" and visa_required(countries_json, entrant):
-            if check_valid_visa(entrant) is False:
-                list_of_checked_entrants.append("Reject")
-                continue
+        if reason(entrant) == "Visit" and \
+                        visa_required(countries_json, entrant) is True and \
+                        check_valid_visa(entrant) is False:
+            list_of_checked_entrants.append("Reject")
+            continue
+
+        if reason(entrant) == "Transit" and \
+                        visa_required(countries_json, entrant) is True and \
+                        check_valid_visa(entrant) is False:
+            list_of_checked_entrants.append("Reject")
+            continue
 
         if check_quarantine(countries_json, entrant) is False:
             list_of_checked_entrants.append("Quarantine")
@@ -65,7 +70,7 @@ def decide(input_file, watchlist_file, countries_file):
             continue
 
         if check_from_kan(entrant):
-            list_of_checked_entrants.append("Accept-From-Kan")
+            list_of_checked_entrants.append("Accept")
             continue
 
         else:
@@ -82,7 +87,7 @@ def check_quarantine(countries_json, entrant):
     :param entrant: The name of a JSON formatted file with person's "from" and "home" keys
     :return: a Boolean which is True when there is no quarantine and False when the subject must be quarantined
     """
-    # print(entrant)
+
     from_country = entrant['from']['country']
     if countries_json[from_country]["medical_advisory"] != "":
         return False
@@ -142,7 +147,7 @@ def check_from_kan(entrant):
     :return: A bool which is True if person is from Kanadia, False otherwise
     """
 
-    if entrant['from']['country'].upper == "KAN" and entrant['entry_reason'] == 'returning':
+    if entrant['from']['country'].upper() == "KAN" and entrant['entry_reason'] == 'returning':
         return True
 
     return False
@@ -154,12 +159,22 @@ def valid_passport_format(passport_number):
     :param passport_number: alpha-numeric string
     :return: Boolean; True if the format is valid, False otherwise
     """
-    passport_format = re.compile('.{5}-.{5}-.{5}-.{5}-.{5}')
+    passport_format = re.compile('^.{5}-.{5}-.{5}-.{5}-.{5}$')
 
     if passport_format.match(passport_number):
         return True
     else:
         return False
+
+
+def valid_visa_format(entrant):
+    for word in entrant:
+        if word == "visa":
+            visa_format = re.compile('^.{5}-.{5}$')
+            if visa_format.match(entrant['visa']['code']):
+                return True
+            else:
+                return False
 
 
 def valid_date_format(entrant):
@@ -187,27 +202,26 @@ def visa_required(countries, entrant):
 
     for country in countries:
 
-        if countries[country]['visitor_visa_required'] == "1" and entrant['from']['country'] != country['code']:
+        if countries[country]['visitor_visa_required'] == "1" and entrant['from']['country'] == countries[country]['code']:
             return True
-        elif countries[country]['transit_visa_required'] == "1" and entrant['from']['country'] != country['code']:
+        elif countries[country]['transit_visa_required'] == "1" and entrant['from']['country'] == countries[country]['code']:
             return True
         else:
             return False
 
 
-def reason(entrants):
+def reason(entrant):
     """
     Checks the entrant's motive for travelling.
     :return:
     """
 
-    for entrant in entrants:
-        if entrant['entry_reason'] == "visit":
-            return "Visit"
-        elif entrant['entry_reason'] == "transit":
-            return "Transit"
-        elif entrant['entry_reason'] == "returning":
-            return "Returning"
+    if entrant['entry_reason'] == "visit":
+        return "Visit"
+    elif entrant['entry_reason'] == "transit":
+        return "Transit"
+    elif entrant['entry_reason'] == "returning":
+        return "Returning"
 
 
 def check_req_keys(entrant):
@@ -242,4 +256,4 @@ def check_req_keys(entrant):
 
 
 
-decide("test_req_keys.json", "watchlist.json", "countries.json")
+decide("example_entries.json", "watchlist.json", "countries.json")
