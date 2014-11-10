@@ -45,6 +45,10 @@ def decide(input_file, watchlist_file, countries_file):
 
     for entrant in entries_json:
 
+        if check_quarantine(countries_json, entrant) is False:
+            list_of_checked_entrants.append("Quarantine")
+            continue
+
         if check_req_keys(entrant) is False:
             list_of_checked_entrants.append("Reject")
             continue
@@ -61,10 +65,6 @@ def decide(input_file, watchlist_file, countries_file):
             list_of_checked_entrants.append("Reject")
             continue
 
-        if check_quarantine(countries_json, entrant) is False:
-            list_of_checked_entrants.append("Quarantine")
-            continue
-
         if check_watchlist(watchlist_json, entrant):
             list_of_checked_entrants.append("Secondary")
             continue
@@ -76,7 +76,7 @@ def decide(input_file, watchlist_file, countries_file):
         else:
             list_of_checked_entrants.append("Accept")
 
-    print(list_of_checked_entrants)
+    return(list_of_checked_entrants)
 
 
 def check_quarantine(countries_json, entrant):
@@ -87,10 +87,16 @@ def check_quarantine(countries_json, entrant):
     :param entrant: The name of a JSON formatted file with person's "from" and "home" keys
     :return: a Boolean which is True when there is no quarantine and False when the subject must be quarantined
     """
+    if 'from' in entrant:
+        try:
+            from_country = entrant['from']['country']
+            #print(entrant)
 
-    from_country = entrant['from']['country']
-    if countries_json[from_country]["medical_advisory"] != "":
-        return False
+        #print(countries_json[from_country]["medical_advisory"] != "" )
+            if countries_json[from_country]["medical_advisory"] != "":
+                return False
+        except:
+            print(entrant)
     elif 'via' in entrant:
         via_country = entrant['via']['country']
         if countries_json[via_country]['medical_advisory'] != "":
@@ -149,7 +155,7 @@ def check_from_kan(entrant):
     :return: A bool which is True if person is from Kanadia, False otherwise
     """
 
-    if entrant['home']['country'].upper() == "KAN" and entrant['entry_reason'] == 'returning':
+    if entrant['home']['country'].upper() == "KAN" and entrant['entry_reason'].upper() == 'RETURNING':
         return True
     else:
         return False
@@ -259,8 +265,12 @@ def check_req_keys(entrant):
                     entrant['last_name'] == "" or \
                     entrant['passport'] == "" or \
                     entrant['birth_date'] == "" or \
-                    entrant['home'] == {"": ""} or \
-                    entrant['from'] == {"": ""} or \
+                    entrant['home']['city'] == "" or \
+                    entrant['home']['region'] == "" or \
+                    entrant['home']['country'] == "" or \
+                    entrant['from']['city'] == "" or \
+                    entrant['from']['region'] == "" or \
+                    entrant['from']['country'] == "" or \
                     entrant['entry_reason'] == "":
                 return False
             else:
@@ -268,3 +278,6 @@ def check_req_keys(entrant):
 
 
 #decide("test_returning_citizen.json", "watchlist.json", "countries.json")
+#decide("test_watchlist.json", "watchlist.json", "countries.json")
+#decide("test_quarantine.json", "watchlist.json", "countries.json")
+#decide("test_req_keys.json", "watchlist.json", "countries.json")
