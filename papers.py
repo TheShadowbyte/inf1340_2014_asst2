@@ -50,14 +50,14 @@ def decide(input_file, watchlist_file, countries_file):
             continue
 
         if reason(entrant) == "Visit" and \
-                        visa_required(countries_json, entrant) is True and \
-                        check_valid_visa(entrant) is False:
+                visa_required(countries_json, entrant) is True and \
+                check_valid_visa(entrant) is False:
             list_of_checked_entrants.append("Reject")
             continue
 
         if reason(entrant) == "Transit" and \
-                        visa_required(countries_json, entrant) is True and \
-                        check_valid_visa(entrant) is False:
+                visa_required(countries_json, entrant) is True and \
+                check_valid_visa(entrant) is False:
             list_of_checked_entrants.append("Reject")
             continue
 
@@ -134,7 +134,7 @@ def check_watchlist(watchlist, entrant):
         if entrant["passport"].upper() == suspect["passport"].upper():
             return True
         elif entrant['first_name'].upper() == suspect['first_name'].upper() and \
-                        suspect['last_name'].upper() == entrant['last_name'].upper():
+                suspect['last_name'].upper() == entrant['last_name'].upper():
             return True
 
     return False
@@ -142,20 +142,24 @@ def check_watchlist(watchlist, entrant):
 
 def check_from_kan(entrant):
     """
-    Checks whether a person is from Kanadia, and if they meet the other requirements, admits them home
+    (dict) -> Bool
+    Checks whether a person is from Kanadia, and if they meet the other requirements, appends "Accept"
+
     :param entrant: the name of a JSON formatted file with the names and passports of people entering Kanadia
     :return: A bool which is True if person is from Kanadia, False otherwise
     """
 
-    if entrant['from']['country'].upper() == "KAN" and entrant['entry_reason'] == 'returning':
+    if entrant['home']['country'].upper() == "KAN" and entrant['entry_reason'] == 'returning':
         return True
-
-    return False
+    else:
+        return False
 
 
 def valid_passport_format(passport_number):
     """
+    (str) -> Bool
     Checks whether a pasport number is five sets of five alpha-number characters separated by dashes
+
     :param passport_number: alpha-numeric string
     :return: Boolean; True if the format is valid, False otherwise
     """
@@ -168,6 +172,12 @@ def valid_passport_format(passport_number):
 
 
 def valid_visa_format(entrant):
+    """
+    (Dict) -> Bool
+    Checks that the Visa for an entrant is in the correct alpha-numeric format
+    :param entrant: individual entrant's JSON fetched from for loop in decide()
+    :return: Boolean True if the format is valid, False otherwise
+    """
     for word in entrant:
         if word == "visa":
             visa_format = re.compile('^.{5}-.{5}$')
@@ -196,8 +206,9 @@ def valid_date_format(entrant):
 def visa_required(countries, entrant):
     """
     Checks whether the country requires a visa or not.
-    :param entrant: Boolean True is a transit visa is required and False if it is not required.
-    :return:
+    :param countries:
+    :param entrant: individual entrant's dictionary fetched from for loop in decide()
+    :return: Boolean True is a transit visa is required and False if it is not required.
     """
 
     for country in countries:
@@ -212,8 +223,10 @@ def visa_required(countries, entrant):
 
 def reason(entrant):
     """
-    Checks the entrant's motive for travelling.
-    :return:
+    (dict) -> str
+    Checks the entrant's motive for travelling, to determine what checks need to be implemented.
+    :param: entrant: individual entrant's dictionary fetched from for loop in decide()
+    :return: a string to be passed to other functions in decide()
     """
 
     if entrant['entry_reason'] == "visit":
@@ -227,33 +240,31 @@ def reason(entrant):
 def check_req_keys(entrant):
     """
    (dict key) -> Bool
-   Loops through the
+   Looks through the entrants keys to see if they are all present,
+    then checks to make sure they all have populated values.
    :param entrant: The dictionary of entrants to be looped over
    :return: Returns a Bool that is False iff a required json key is omitted
    """
-    #key_list = ['passport', 'first_name', 'last_name', 'birth_date', 'home', 'from', 'entry_reason']
-    #if key_list not in entrant
 
     if 'first_name' not in entrant or \
-                        'last_name' not in entrant or \
-                        'passport' not in entrant or \
-                        'birth_date' not in entrant or\
-                        'home' not in entrant or \
-                        'from' not in entrant or \
-                        'entry_reason'not in entrant:
+            'last_name' not in entrant or \
+            'passport' not in entrant or \
+            'birth_date' not in entrant or\
+            'home' not in entrant or \
+            'from' not in entrant or \
+            'entry_reason'not in entrant:
         return False
     else:
             if entrant['first_name'] == "" or \
                     entrant['last_name'] == "" or \
                     entrant['passport'] == "" or \
                     entrant['birth_date'] == "" or \
-                    entrant['home'] == {"" : ""} or \
-                    entrant['from'] == {"" : ""} or \
+                    entrant['home'] == {"": ""} or \
+                    entrant['from'] == {"": ""} or \
                     entrant['entry_reason'] == "":
                 return False
             else:
                 return True
 
 
-
-decide("example_entries.json", "watchlist.json", "countries.json")
+#decide("test_returning_citizen.json", "watchlist.json", "countries.json")
