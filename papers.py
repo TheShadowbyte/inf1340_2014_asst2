@@ -44,7 +44,8 @@ def decide(input_file, watchlist_file, countries_file):
     list_of_checked_entrants = []
 
     for entrant in entries_json:
-
+        #valid_visa_format(entrant)
+        #valid_passport_format(entrant)
         if check_quarantine(countries_json, entrant) is False:
             list_of_checked_entrants.append("Quarantine")
             continue
@@ -76,7 +77,7 @@ def decide(input_file, watchlist_file, countries_file):
         else:
             list_of_checked_entrants.append("Accept")
 
-    return(list_of_checked_entrants)
+    return list_of_checked_entrants
 
 
 def check_quarantine(countries_json, entrant):
@@ -161,17 +162,17 @@ def check_from_kan(entrant):
         return False
 
 
-def valid_passport_format(passport_number):
+def valid_passport_format(entrant):
     """
     (str) -> Bool
-    Checks whether a pasport number is five sets of five alpha-number characters separated by dashes
+    Checks whether a passport number is five sets of five alpha-number characters separated by dashes
 
     :param passport_number: alpha-numeric string
-    :return: Boolean; True if the format is valid, False otherwise
+    :return: Boolean True if the format is valid, False otherwise
     """
-    passport_format = re.compile('^.{5}-.{5}-.{5}-.{5}-.{5}$')
+    # passport_format = re.compile('^.{5}-.{5}-.{5}-.{5}-.{5}$')
 
-    if passport_format.match(passport_number):
+    if re.match('^.{5}-.{5}-.{5}-.{5}-.{5}$', entrant['passport']) is not None:
         return True
     else:
         return False
@@ -186,8 +187,7 @@ def valid_visa_format(entrant):
     """
     for word in entrant:
         if word == "visa":
-            visa_format = re.compile('^.{5}-.{5}$')
-            if visa_format.match(entrant['visa']['code']):
+            if re.match('^.{5}-.{5}$', entrant['visa']['code']) is not None:
                 return True
             else:
                 return False
@@ -219,9 +219,11 @@ def visa_required(countries, entrant):
 
     for country in countries:
 
-        if countries[country]['visitor_visa_required'] == "1" and entrant['from']['country'] == countries[country]['code']:
+        if countries[country]['visitor_visa_required'] == "1" and \
+                        entrant['from']['country'] == countries[country]['code']:
             return True
-        elif countries[country]['transit_visa_required'] == "1" and entrant['from']['country'] == countries[country]['code']:
+        elif countries[country]['transit_visa_required'] == "1" and \
+                        entrant['from']['country'] == countries[country]['code']:
             return True
         else:
             return False
@@ -281,3 +283,5 @@ def check_req_keys(entrant):
 #decide("test_watchlist.json", "watchlist.json", "countries.json")
 #decide("test_quarantine.json", "watchlist.json", "countries.json")
 #decide("test_req_keys.json", "watchlist.json", "countries.json")
+decide("example_entries.json", "watchlist.json", "countries.json")
+#decide("test_visa_format.json", "watchlist.json", "countries.json")
