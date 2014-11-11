@@ -14,6 +14,7 @@ __status__ = "Working on it"
 import re
 import datetime
 import json
+import time
 
 # We need to make sure that Python doesn't get confused about the cases of its entries!!
 
@@ -44,7 +45,7 @@ def decide(input_file, watchlist_file, countries_file):
     list_of_checked_entrants = []
 
     for entrant in entries_json:
-
+        valid_date_format(entrant)
         if check_quarantine(countries_json, entrant) is False:
             list_of_checked_entrants.append("Quarantine")
             continue
@@ -53,7 +54,9 @@ def decide(input_file, watchlist_file, countries_file):
             list_of_checked_entrants.append("Reject")
             continue
 
-        if valid_visa_format(entrant) is False or valid_passport_format(entrant) is False:
+        if valid_visa_format(entrant) is False or \
+                        valid_passport_format(entrant) is False or \
+                        valid_date_format(entrant) is False:
             list_of_checked_entrants.append("Reject")
             continue
 
@@ -205,10 +208,12 @@ def valid_date_format(entrant):
 
     for word in entrant:
         if word == "visa":
-            try:
-                datetime.datetime.strptime(entrant[word]['date'], '%Y-%m-%d')
+            # The first regular expression in the following conditional conjunction checks if the provided date is
+            # correct length (YYYY-MM-DD), whereas the second regular expression checks if the values are integers.
+            if re.match('^.{4}-.{2}-.{2}$', entrant[word]['date']) is not None and \
+                            re.match('^-?[0-9]+-?[0-9]+-?[0-9]+$', entrant[word]['date']) is not None:
                 return True
-            except ValueError:
+            else:
                 return False
 
 
