@@ -45,6 +45,6 @@ def test_files(): #Tests a full truth-table of missing files
         decide("test_returning_citizen.json", "", "")
 
 
-def test_date_format():
+def test_date_format(): #Tests a case where the date format is not correct
     assert decide("test_date_format.json",  "watchlist.json", "countries.json") == ['Reject']
 # add functions for other tests
