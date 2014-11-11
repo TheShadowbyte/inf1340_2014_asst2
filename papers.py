@@ -120,6 +120,7 @@ def check_valid_visa(entrant):
     else:
         return False
 
+
 def check_watchlist(watchlist, entrant):
     """
     Checks the passport number and name of entrant against the watchlist by iterating over the entries file and
@@ -211,12 +212,15 @@ def visa_required(countries, entrant):
     :param entrant: individual entrant's dictionary fetched from for loop in decide()
     :return: Boolean True if a visit or transit visa is required and False if it is not required.
     """
-
-    for country in countries:
-        if countries[country]['visitor_visa_required'] == "1" and entrant['from']['country'] == country or \
-                countries[country]['transit_visa_required'] == "1" and entrant['from']['country'] == country:
-            return True
-    return False
+    
+    if countries[entrant['from']['country']]['code'] == entrant['from']['country'] and \
+                    countries[entrant['from']['country']]['visitor_visa_required'] == "1":
+        return True
+    elif countries[entrant['from']['country']]['code'] == entrant['from']['country'] and \
+                    countries[entrant['from']['country']]['transit_visa_required'] == "1":
+        return True
+    else:
+        return False
 
 
 def reason(entrant):
