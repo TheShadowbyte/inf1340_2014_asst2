@@ -74,6 +74,7 @@ def decide(input_file, watchlist_file, countries_file):
         else:
             list_of_checked_entrants.append("Accept")
 
+    print(list_of_checked_entrants)
     return list_of_checked_entrants
 
 
@@ -110,14 +111,14 @@ def check_valid_visa(entrant):
     """
 
     visa_oldest_date = datetime.datetime.now() - datetime.timedelta(days=730)
-    for word in entrant:
-        if word == "visa":
-            if entrant[word]['date'] > str(visa_oldest_date):
-                print(entrant[word]['date'])
-                return True
-            else:
-                return False
 
+    if 'visa' in entrant:
+        if entrant['visa']['date'] > str(visa_oldest_date):
+            return True
+        else:
+            return False
+    else:
+        return False
 
 def check_watchlist(watchlist, entrant):
     """
@@ -206,7 +207,7 @@ def valid_date_format(entrant):
 def visa_required(countries, entrant):
     """
     Checks whether the country requires a visa or not.
-    :param countries:
+    :param countries: the JSON that knows if a visa is needed for an entrant
     :param entrant: individual entrant's dictionary fetched from for loop in decide()
     :return: Boolean True if a visit or transit visa is required and False if it is not required.
     """
@@ -272,5 +273,7 @@ def check_req_keys(entrant):
 #decide("test_watchlist.json", "watchlist.json", "countries.json")
 #decide("test_quarantine.json", "watchlist.json", "countries.json")
 #decide("test_req_keys.json", "watchlist.json", "countries.json")
-decide("test_case.json", "watchlist.json", "countries.json")
+#decide("test_case.json", "watchlist.json", "countries.json")
 #decide("test_visa_format.json", "watchlist.json", "countries.json")
+decide("test_transit_visa.json", "watchlist.json", "countries.json")
+decide("test_visit_visa.json", "watchlist.json", "countries.json")

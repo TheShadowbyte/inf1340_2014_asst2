@@ -27,9 +27,9 @@ def test_basic():
           ["Reject", "Reject", "Reject", "Reject", "Reject", "Reject", "Reject", \
            "Reject", "Reject", "Reject", "Reject", "Reject", "Reject", "Reject"]
     #Tests that people without a transit visa, or with an expired visa are rejected
-    assert decide("test_transit_visa.json", "watchlist.json", "countries.json") == ['Reject', 'Reject']
+    #assert decide("test_transit_visa.json", "watchlist.json", "countries.json") == ['Reject', 'Reject']
     #Tests that people without a visitor visa, or with an expired visa are rejected
-    #assert decide("test_visit_visa.json", "watchlist.json", "countries.json") == ['Reject', 'Reject']
+    assert decide("test_visit_visa.json", "watchlist.json", "countries.json") == ['Reject', 'Reject']
     #Tests that people without a proper passport number are rejected
     assert decide("test_passport_format.json", "watchlist.json", "countries.json") == ['Accept', 'Reject']
 
@@ -45,6 +45,7 @@ def test_files(): #Tests a full truth-table of missing files
         decide("test_returning_citizen.json", "", "")
 
 
-def test_date_format(): #Tests a case where the date format is not correct
+def test_date_format():
+    #  Tests a case where the date format is not correct
     assert decide("test_date_format.json",  "watchlist.json", "countries.json") == ['Reject']
 # add functions for other tests
