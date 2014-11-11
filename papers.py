@@ -51,12 +51,6 @@ def decide(input_file, watchlist_file, countries_file):
             list_of_checked_entrants.append("Reject")
             continue
 
-        if valid_visa_format(entrant) is False or \
-                        valid_passport_format(entrant) is False or \
-                        valid_date_format(entrant) is False:
-            list_of_checked_entrants.append("Reject")
-            continue
-
         if reason(entrant) == "Visit" and \
                 visa_required(countries_json, entrant) is True and \
                 check_valid_visa(entrant) is False:
@@ -79,7 +73,7 @@ def decide(input_file, watchlist_file, countries_file):
 
         else:
             list_of_checked_entrants.append("Accept")
-    print(list_of_checked_entrants)
+
     return list_of_checked_entrants
 
 
@@ -94,9 +88,7 @@ def check_quarantine(countries_json, entrant):
     if 'from' in entrant:
         try:
             from_country = entrant['from']['country']
-            #print(entrant)
 
-        #print(countries_json[from_country]["medical_advisory"] != "" )
             if countries_json[from_country]["medical_advisory"] != "":
                 return False
         except:
@@ -216,19 +208,14 @@ def visa_required(countries, entrant):
     Checks whether the country requires a visa or not.
     :param countries:
     :param entrant: individual entrant's dictionary fetched from for loop in decide()
-    :return: Boolean True is a transit visa is required and False if it is not required.
+    :return: Boolean True if a visit or transit visa is required and False if it is not required.
     """
 
     for country in countries:
-
-        if countries[country]['visitor_visa_required'] == "1" and \
-                        entrant['from']['country'] == countries[country]['code']:
+        if countries[country]['visitor_visa_required'] == "1" and entrant['from']['country'] == country or \
+                countries[country]['transit_visa_required'] == "1" and entrant['from']['country'] == country:
             return True
-        elif countries[country]['transit_visa_required'] == "1" and \
-                        entrant['from']['country'] == countries[country]['code']:
-            return True
-        else:
-            return False
+    return False
 
 
 def reason(entrant):
