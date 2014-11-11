@@ -16,25 +16,24 @@ from papers import decide
 
 
 def test_basic():
-    #Tests that two KAN citizens are admitted
+    # Tests that two KAN citizens are admitted
     assert decide("test_returning_citizen.json", "watchlist.json", "countries.json") == ["Accept", "Accept"]
-    #Tests that a suspect on watchlist is detained for secondary processing
+    # Tests that a suspect on watchlist is detained for secondary processing
     assert decide("test_watchlist.json", "watchlist.json", "countries.json") == ["Secondary"]
-    #Tests that someone from a medical advisory country is Quarantines
+    # Tests that someone from a medical advisory country is Quarantines
     assert decide("test_quarantine.json", "watchlist.json", "countries.json") == ["Quarantine"]
-    #Tests that if any necessary key is either missing or without value, the entrant is rejection
+    # Tests that if any necessary key is either missing or without value, the entrant is rejection
+    # Note: this test tests ALL POSSIBLE failures individually
     assert decide("test_req_keys.json", "watchlist.json", "countries.json") == \
-          ["Reject", "Reject", "Reject", "Reject", "Reject", "Reject", "Reject", \
-           "Reject", "Reject", "Reject", "Reject", "Reject", "Reject", "Reject"]
-    #Tests that people without a transit visa, or with an expired visa are rejected
+        ["Reject", "Reject", "Reject", "Reject", "Reject", "Reject", "Reject",
+            "Reject", "Reject", "Reject", "Reject", "Reject", "Reject", "Reject"]
+    # Tests that people without a transit visa, or with an expired visa are rejected
     assert decide("test_transit_visa.json", "watchlist.json", "countries.json") == ['Reject', 'Reject']
-    #Tests that people without a visitor visa, or with an expired visa are rejected
+    # Tests that people without a visitor visa, or with an expired visa are rejected
     assert decide("test_visit_visa.json", "watchlist.json", "countries.json") == ['Reject', 'Reject']
-    #Tests that people without a proper passport number are rejected
-    assert decide("test_passport_format.json", "watchlist.json", "countries.json") == ['Accept', 'Reject']
 
 
-def test_files(): #Tests a full truth-table of missing files
+def test_files(): # Tests a full truth-table of missing files
     with pytest.raises(FileNotFoundError):
         decide("test_returning_citizen.json", "", "countries.json")
         decide("test_returning_citizen.json", "watchlist.json", "")
@@ -46,7 +45,7 @@ def test_files(): #Tests a full truth-table of missing files
         decide("test_returning_citizen.json", "", "")
 
 
-def test_date_format():
-    #  Tests a case where the date format is not correct
+def test_format():
+    #  Tests a case where the formats are not correct
     assert decide("test_date_format.json",  "watchlist.json", "countries.json") == ['Reject']
-# add functions for other tests
+    assert decide("test_passport_format.json", "watchlist.json", "countries.json") == ['Accept', 'Reject']
