@@ -79,7 +79,7 @@ def decide(input_file, watchlist_file, countries_file):
 
         else:
             list_of_checked_entrants.append("Accept")
-
+    print(list_of_checked_entrants)
     return list_of_checked_entrants
 
 
@@ -120,13 +120,11 @@ def check_valid_visa(entrant):
     visa_oldest_date = datetime.datetime.now() - datetime.timedelta(days=730)
     for word in entrant:
         if word == "visa":
-            if not entrant[word]['date']:
-                return False
+            if entrant[word]['date'] > str(visa_oldest_date):
+                print(entrant[word]['date'])
+                return True
             else:
-                if entrant[word]['date'] < str(visa_oldest_date):
-                    return True
-                else:
-                    return False
+                return False
 
 
 def check_watchlist(watchlist, entrant):
@@ -287,5 +285,5 @@ def check_req_keys(entrant):
 #decide("test_watchlist.json", "watchlist.json", "countries.json")
 #decide("test_quarantine.json", "watchlist.json", "countries.json")
 #decide("test_req_keys.json", "watchlist.json", "countries.json")
-decide("example_entries.json", "watchlist.json", "countries.json")
+decide("test_case.json", "watchlist.json", "countries.json")
 #decide("test_visa_format.json", "watchlist.json", "countries.json")
