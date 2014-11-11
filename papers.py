@@ -40,10 +40,14 @@ def decide(input_file, watchlist_file, countries_file):
         raise FileNotFoundError
 
     list_of_checked_entrants = []
+    list_of_countries_requiring_transit_visas = []
+    list_of_countries_requiring_visitor_visas = []
+
+
 
     for entrant in entries_json:
 
-        if check_quarantine(countries_json, entrant) is False:
+        if send_to_quarantine(countries_json, entrant):
             list_of_checked_entrants.append("Quarantine")
             continue
 
@@ -52,14 +56,20 @@ def decide(input_file, watchlist_file, countries_file):
             continue
 
         if reason(entrant) == "Visit" and \
-                visa_required(countries_json, entrant) is True and \
-                check_valid_visa(entrant) is False:
+                check_valid_visa(entrant) is False and \
+                visa_required(countries_json, entrant) is True:
+            print(visa_required(countries_json, entrant))
             list_of_checked_entrants.append("Reject")
             continue
 
         if reason(entrant) == "Transit" and \
                 visa_required(countries_json, entrant) is True and \
                 check_valid_visa(entrant) is False:
+            list_of_checked_entrants.append("Reject")
+            continue
+
+        if valid_passport_format(entrant) is False or \
+            valid_visa_format(entrant) is False:
             list_of_checked_entrants.append("Reject")
             continue
 
@@ -78,9 +88,9 @@ def decide(input_file, watchlist_file, countries_file):
     return list_of_checked_entrants
 
 
-def check_quarantine(countries_json, entrant):
+def send_to_quarantine(countries_json, entrant):
     """
-    Checks the passport "from" and "home" keys against the medical advisory list.
+    Checks the passport "from" and "via" keys against the medical advisory list.
 
     :param countries_list: The name of a JSON formatted file with the medical advisories under key "medical_advisory"
     :param entrant: The name of a JSON formatted file with person's "from" and "home" keys
@@ -91,15 +101,15 @@ def check_quarantine(countries_json, entrant):
             from_country = entrant['from']['country']
 
             if countries_json[from_country]["medical_advisory"] != "":
-                return False
+                return True
         except:
             print(entrant)
     elif 'via' in entrant:
         via_country = entrant['via']['country']
         if countries_json[via_country]['medical_advisory'] != "":
-            return False
+            return True
     else:
-        return True
+        return False
 
 
 def check_valid_visa(entrant):
@@ -120,7 +130,6 @@ def check_valid_visa(entrant):
     else:
         return False
 
-
 def check_watchlist(watchlist, entrant):
     """
     Checks the passport number and name of entrant against the watchlist by iterating over the entries file and
@@ -132,13 +141,11 @@ def check_watchlist(watchlist, entrant):
     """
 
     for suspect in watchlist:
-
         if entrant["passport"].upper() == suspect["passport"].upper():
             return True
         elif entrant['first_name'].upper() == suspect['first_name'].upper() and \
                 suspect['last_name'].upper() == entrant['last_name'].upper():
             return True
-
     return False
 
 
@@ -212,13 +219,20 @@ def visa_required(countries, entrant):
     :param entrant: individual entrant's dictionary fetched from for loop in decide()
     :return: Boolean True if a visit or transit visa is required and False if it is not required.
     """
-    
-    if countries[entrant['from']['country']]['code'] == entrant['from']['country'] and \
-                    countries[entrant['from']['country']]['visitor_visa_required'] == "1":
-        return True
-    elif countries[entrant['from']['country']]['code'] == entrant['from']['country'] and \
-                    countries[entrant['from']['country']]['transit_visa_required'] == "1":
-        return True
+    list_of_countries_requiring_visitor_visas = []
+    list_of_countries_requiring_transit_visas = []
+
+    for country in countries:
+        if countries[country]['visitor_visa_required'] == "1":
+            list_of_countries_requiring_visitor_visas.append(country)
+        elif countries[country]['transit_visa_required'] == "1":
+            list_of_countries_requiring_transit_visas.append(country)
+
+
+    if entrant['from']['country'] in list_of_countries_requiring_visitor_visas:
+            return True
+    elif entrant['via']['country'] in list_of_countries_requiring_transit_visas:
+            return True
     else:
         return False
 
@@ -273,11 +287,13 @@ def check_req_keys(entrant):
                 return True
 
 
+
 #decide("test_returning_citizen.json", "watchlist.json", "countries.json")
+#decide("example_entries.json", "watchlist.json", "countries.json")
 #decide("test_watchlist.json", "watchlist.json", "countries.json")
 #decide("test_quarantine.json", "watchlist.json", "countries.json")
 #decide("test_req_keys.json", "watchlist.json", "countries.json")
 #decide("test_case.json", "watchlist.json", "countries.json")
 #decide("test_visa_format.json", "watchlist.json", "countries.json")
-decide("test_transit_visa.json", "watchlist.json", "countries.json")
-decide("test_visit_visa.json", "watchlist.json", "countries.json")
+#decide("test_transit_visa.json", "watchlist.json", "countries.json")
+#decide("test_visit_visa.json", "watchlist.json", "countries.json")

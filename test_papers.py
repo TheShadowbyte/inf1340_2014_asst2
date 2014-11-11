@@ -27,11 +27,12 @@ def test_basic():
           ["Reject", "Reject", "Reject", "Reject", "Reject", "Reject", "Reject", \
            "Reject", "Reject", "Reject", "Reject", "Reject", "Reject", "Reject"]
     #Tests that people without a transit visa, or with an expired visa are rejected
-    #assert decide("test_transit_visa.json", "watchlist.json", "countries.json") == ['Reject', 'Reject']
+    assert decide("test_transit_visa.json", "watchlist.json", "countries.json") == ['Reject', 'Reject']
     #Tests that people without a visitor visa, or with an expired visa are rejected
     assert decide("test_visit_visa.json", "watchlist.json", "countries.json") == ['Reject', 'Reject']
     #Tests that people without a proper passport number are rejected
     assert decide("test_passport_format.json", "watchlist.json", "countries.json") == ['Accept', 'Reject']
+
 
 def test_files(): #Tests a full truth-table of missing files
     with pytest.raises(FileNotFoundError):
