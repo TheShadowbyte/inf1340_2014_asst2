@@ -14,9 +14,6 @@ __status__ = "Working on it"
 import re
 import datetime
 import json
-import time
-
-# We need to make sure that Python doesn't get confused about the cases of its entries!!
 
 
 def decide(input_file, watchlist_file, countries_file):
@@ -45,7 +42,7 @@ def decide(input_file, watchlist_file, countries_file):
     list_of_checked_entrants = []
 
     for entrant in entries_json:
-        valid_date_format(entrant)
+
         if check_quarantine(countries_json, entrant) is False:
             list_of_checked_entrants.append("Quarantine")
             continue
@@ -176,7 +173,6 @@ def valid_passport_format(entrant):
     :param passport_number: alpha-numeric string
     :return: Boolean True if the format is valid, False otherwise
     """
-    # passport_format = re.compile('^.{5}-.{5}-.{5}-.{5}-.{5}$')
 
     if re.match('^.{5}-.{5}-.{5}-.{5}-.{5}$', entrant['passport']) is not None:
         return True
