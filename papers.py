@@ -228,7 +228,6 @@ def visa_required(countries, entrant):
         elif countries[country]['transit_visa_required'] == "1":
             list_of_countries_requiring_transit_visas.append(country)
 
-
     if entrant['from']['country'] in list_of_countries_requiring_visitor_visas:
             return True
     elif entrant['via']['country'] in list_of_countries_requiring_transit_visas:
